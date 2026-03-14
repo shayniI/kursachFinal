@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Управление Клиентами{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h2>Список Клиентов</h2>
+    </div>
+    <div class="col text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">+ Добавить Клиента</button>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('clients_list') }}" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control bg-dark text-white border-secondary" 
+                       placeholder="Поиск по имени..." value="{{ current_search or '' }}">
+            </div>
+            <div class="col-md-3">
+                <select name="region" class="form-select bg-dark text-white border-secondary">
+                    <option value="">Все регионы</option>
+                    {% for region in regions %}
+                    <option value="{{ region }}" {% if current_region == region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="industry" class="form-select bg-dark text-white border-secondary">
+                    <option value="">Все отрасли</option>
+                    {% for industry in industries %}
+                    <option value="{{ industry }}" {% if current_industry == industry %}selected{% endif %}>{{ industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Применить</button>
+                <a href="{{ url_for('clients_list') }}" class="btn btn-outline-secondary">Сброс</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Регион</th>
+                        <th>Индустрия</th>
+                        <th>Дата Регистрации</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.region }}</td>
+                        <td>{{ client.industry }}</td>
+                        <td>{{ client.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not clients %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">Клиенты не найдены. Попробуйте изменить параметры фильтрации.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-warning">Новый Клиент</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('add_client') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">ФИО / Название компании</label>
+                        <input type="text" name="name" class="form-control bg-secondary text-white border-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control bg-secondary text-white border-0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Регион</label>
+                        <input type="text" name="region" class="form-control bg-secondary text-white border-0" placeholder="Напр: Москва">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Индустрия</label>
+                        <input type="text" name="industry" class="form-control bg-secondary text-white border-0" placeholder="Напр: IT">
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

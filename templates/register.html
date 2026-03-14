@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header text-center">Создать Аккаунт</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" name="username" class="form-control bg-dark text-white border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control bg-dark text-white border-secondary" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    Уже есть аккаунт? <a href="{{ url_for('login') }}" class="text-warning">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

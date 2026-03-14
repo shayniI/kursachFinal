@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Общая статистика{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Панель анализа клиентской базы</h2>
+
+<!-- Фильтры статистики -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('dashboard') }}" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Регион</label>
+                <select name="region" class="form-select bg-dark text-white border-secondary">
+                    <option value="">Все регионы</option>
+                    {% for region in regions %}
+                    <option value="{{ region }}" {% if current_region == region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Отрасль</label>
+                <select name="industry" class="form-select bg-dark text-white border-secondary">
+                    <option value="">Все отрасли</option>
+                    {% for industry in industries %}
+                    <option value="{{ industry }}" {% if current_industry == industry %}selected{% endif %}>{{ industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Период (дней)</label>
+                <select name="period" class="form-select bg-dark text-white border-secondary">
+                    <option value="7" {% if current_period == '7' %}selected{% endif %}>7 дней</option>
+                    <option value="30" {% if current_period == '30' %}selected{% endif %}>30 дней</option>
+                    <option value="90" {% if current_period == '90' %}selected{% endif %}>90 дней</option>
+                    <option value="365" {% if current_period == '365' %}selected{% endif %}>Год</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary w-100">Обновить</button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Сброс</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Основные показатели -->
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-header">Общая выручка</div>
+            <div class="card-body">
+                <div class="stat-value">{{ total_revenue | round(2) }} ₽</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-header">Количество клиентов</div>
+            <div class="card-body">
+                <div class="stat-value">{{ total_clients }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-header">Средний чек</div>
+            <div class="card-body">
+                <div class="stat-value">{{ avg_order | round(2) }} ₽</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- График продаж -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Динамика продаж за выбранный период</div>
+            <div class="card-body">
+                <canvas id="salesChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Лучшие клиенты -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Топ-5 клиентов по выручке</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for client in top_clients %}
+                    <li class="list-group-item bg-dark text-white d-flex justify-content-between align-items-center border-secondary">
+                        <div>
+                            <div>{{ client.name }}</div>
+                            <small class="text-muted">Заказов: {{ client.orders_count }}</small>
+                        </div>
+                        <span class="badge bg-warning text-dark">{{ client.revenue | round(2) }} ₽</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Распределение по регионам -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Распределение по регионам (количество клиентов)</div>
+            <div class="card-body">
+                <canvas id="regionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Анализ по отраслям -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Анализ по отраслям</div>
+            <div class="card-body">
+                <canvas id="industryChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Выручка по регионам -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Выручка по регионам</div>
+            <div class="card-body">
+                <canvas id="regionRevenueChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Аналитическое заключение</div>
+            <div class="card-body">
+                <p>Результаты проведенного анализа:</p>
+                <ul>
+                    <li>Распределение клиентской базы по регионам и отраслям соответствует рыночной конъюнктуре.</li>
+                    <li>Динамика продаж позволяет судить об эффективности текущей стратегии взаимодействия.</li>
+                </ul>
+                <div class="alert alert-info bg-dark text-info border-info">
+                    <strong>Вывод:</strong> Значительная часть прибыли формируется за счет ограниченного круга ключевых клиентов. Рекомендуется уделить внимание их удержанию и развитию.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Настройка графиков
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+                label: 'Выручка (₽)',
+                data: {{ values | tojson }},
+                borderColor: '#ffcc00',
+                backgroundColor: 'rgba(255, 204, 0, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#444' }, ticks: { color: '#fff' } },
+                x: { grid: { color: '#444' }, ticks: { color: '#fff' } }
+            },
+            plugins: {
+                legend: { labels: { color: '#fff' } }
+            }
+        }
+    });
+
+    const regionCtx = document.getElementById('regionChart').getContext('2d');
+    new Chart(regionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ reg_labels | tojson }},
+            datasets: [{
+                data: {{ reg_values | tojson }},
+                backgroundColor: ['#ffcc00', '#ff9900', '#ff6600', '#ff3300', '#cc0000', '#990000'],
+                borderWidth: 1,
+                borderColor: '#1a1a1a'
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#fff' } }
+            }
+        }
+    });
+
+    const industryCtx = document.getElementById('industryChart').getContext('2d');
+    new Chart(industryCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ ind_labels | tojson }},
+            datasets: [{
+                label: 'Количество клиентов',
+                data: {{ ind_values | tojson }},
+                backgroundColor: '#ffcc00',
+                borderWidth: 0
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#444' }, ticks: { color: '#fff' } },
+                x: { grid: { color: '#444' }, ticks: { color: '#fff' } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    const regRevCtx = document.getElementById('regionRevenueChart').getContext('2d');
+    new Chart(regRevCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ reg_labels | tojson }},
+            datasets: [{
+                label: 'Выручка по регионам (₽)',
+                data: {{ reg_revenue | tojson }},
+                backgroundColor: 'rgba(255, 204, 0, 0.7)',
+                borderColor: '#ffcc00',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#444' }, ticks: { color: '#fff' } },
+                y: { grid: { color: '#444' }, ticks: { color: '#fff' } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

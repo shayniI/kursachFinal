@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Вход в систему{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header text-center">Авторизация</div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Логин</label>
+                        <input type="text" name="username" class="form-control bg-dark text-white border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" name="password" class="form-control bg-dark text-white border-secondary" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    Нет аккаунта? <a href="{{ url_for('register') }}" class="text-warning">Зарегистрироваться</a>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-info mt-3 text-center bg-dark text-info border-info">
+            Логин: <strong>admin</strong><br>
+            Пароль: <strong>admin</strong>
+        </div>
+    </div>
+</div>
+{% endblock %}
